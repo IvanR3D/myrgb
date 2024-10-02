@@ -1,4 +1,9 @@
 <!--
+  Guess My HEX
+  Iván R. Artiles
+  Source: https://github.com/IvanR3D/myrgb
+  A mini game based (forked and redesigned) in the very nice work of:
+
   Guess My RGB 0.1.0
   Copyright (c) 2024 Susam Pal
   Source: https://github.com/susam/myrgb
@@ -6,319 +11,515 @@
 -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Guess My RGB</title>
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A simple RGB color guessing game.">
+    <title>Guess The HEX Color - Educational Mini Game</title>
     <style>
-      html {
-        height: 100%;
-      }
-      body {
-        font-family: monospace,monospace;
-        font-size: large;
-        margin: 0;
-        padding: 1em;
-        text-align: center;
-        box-sizing: border-box;
-        height: 100%;
-      }
-      main {
-        min-height: calc(100% - 4em);
-      }
-      h1 {
-        margin: 0 0 1em 0;
-      }
-      div.ruler, div.slider {
-        align-items: center;
-        display: flex;
-        max-width: 40em;
-        margin: 0.5em auto;
-      }
-      div.ruler div {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-      }
-      label {
-        padding-right: 1em;
-      }
-      input {
-        width: 100%;
-      }
-      div#info, button {
-        margin: 1em auto;
-      }
-      button {
-        max-width: 15em;
-        padding: 0.2em 0.7em;
-        width: 100%;
-        font-family: monospace,monospace;
-        font-size: 1em;
-      }
-      div#result div {
-        margin: 0.5em auto;
-        max-width: 20em;
-        padding: 0.5em;
-      }
-      footer {
-        line-height: 4em;
-      }
-      footer a {
-        margin-right: 1.5em;
-      }
-      footer a:last-child {
-        margin-right: 0;
-      }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            font-family: system-ui, Robot, 'Open Sans', sans-serif;
+            font-size: 62.5%;
+            background-color: #f7f7f7;
+        }
+        body {
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            padding-top: 4rem;
+        }
+        .list-disc {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        .list-inside li {
+            margin: 8px 0;
+        }
+        article {
+            width: 40%;
+            background-color: #fff;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 0.2rem 0.4rem 0 rgba(0, 0, 0, 0.2), 0 0.4rem 0.6rem 0 rgba(0, 0, 0, 0.19);
+        }
+        article header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            font-size: 2.6rem;
+        }
+        button {
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: transparent;
+            padding: 1rem 2rem;
+            transition: background-color .2s ease;
+        }
+        button:hover {
+            cursor: pointer;
+            background-color: #f1f1f1;
+        }
+        article main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 0;
+        }
+        #color-to-guess, #easy-to-guess {
+            width: 98%;
+            height: 12rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            border-radius: 1rem;
+        }
+        #controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            font-size: 1.4rem;
+            padding: 2rem 0;
+        }
+        #controls .color-control {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0.4rem 0;
+        }
+        .color-control span {
+            width: 10%;
+        }
+        .color-control input {
+            width: 80%;
+        }
+        .color-control .hex-value {
+            text-align: center;
+        }
+        #buttons-panel {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+        }
+        #guess-btn {
+            color: #fff;
+            background-color: #111;
+        }
+        #guess-btn:hover {
+            background-color: #111111ce;
+        }
+        #reveal-btn {
+            background-color: #f7f7f7;
+        }
+        #reveal-btn:hover {
+            background-color: #e8e6e6c6;
+        }
+        #modes {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 5px;
+            font-size: 1.4rem;
+            margin: 2rem 0;
+        }
+        input[type=checkbox]{
+            height: 0;
+            width: 0;
+            visibility: hidden;
+        }
+        label {
+            cursor: pointer;
+            text-indent: -9999px;
+            width: 4rem;
+            height: 2rem;
+            background: grey;
+            display: block;
+            border-radius: 1rem;
+            position: relative;
+        }
+        label:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 1px;
+            width: 2rem;
+            height: 2rem;
+            background: #fff;
+            border-radius: 4rem;
+            transition: 0.3s;
+        }
+        input:checked + label {
+            background: #000;
+        }
+        input:checked + label:after {
+            left: calc(100% - 1px);
+            transform: translateX(-100%);
+        }
+        label:active:after {
+            width: 2rem;
+        }
+        footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+        }
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 0.6rem;
+            background: #d3d3d3;
+            outline: none;
+            border-radius: 2rem;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 2rem;
+            height: 2rem;
+            background: transparent;
+            border: 2px solid #d3d3d3;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .slider::-moz-range-thumb {
+            width: 2rem;
+            height: 2rem;
+            background: transparent;
+            border: 2px solid #d3d3d3;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        #red::-webkit-slider-thumb {
+            background-color: #f00;
+        }
+        #green::-webkit-slider-thumb {
+            background-color: #0f0;
+        }
+        #blue::-webkit-slider-thumb {
+            background-color: #00f;
+        }
+        #guesses {
+            width: 100%;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 0.4rem;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+        #guesses .guess-try {
+            width: 96%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+        .guess-try div {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .guess-try div .color {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: red;
+        }
+        .modal {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;            
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 4rem;
+        }
+        .modal-content {
+            width: 60%;
+            height: 60%;
+            background-color: #fff;
+            border-radius: 1rem;
+            padding: 2rem;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .modal-content .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .modal-content .header h2 {
+            font-size: 2rem;
+            color: #333;
+        }
+        .close {
+            cursor: pointer;
+            color: #aaa;
+            font-size: 2rem;
+            transition: color 0.3s ease;
+        }
+        .close:hover {
+            color: #ff4d4d;
+        }
+        .modal-content .body {
+            font-size: 1.4rem;
+            padding: 2rem 0;
+        }
+        .modal-content .body p {
+            padding: 0.5rem 0;
+        }
+        .hidden {
+            display: none!important;
+        }
+        .red {
+            color: #f00;
+        }
+        .orange {
+            color: rgb(208 109 37);
+        }
+        .yellow {
+            color: rgb(200 200 29);
+        }
+        .green {
+            color: #0fa60f;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
-    <script>
-      'use strict'
+</head>
+<body>
+    <article>
+        <header>
+            <h1>Guess the HEX Color</h1>
+            <button id="about-btn">About</button>
+        </header>
+        <main>
+            <div id="color-to-guess"></div>
+            <div id="controls">
+                <div class="color-control">
+                    <span>Red </span>
+                    <input type="range" class="slider" name="" id="red" value="0" min="0" max="15"/>
+                    <span class="hex-value">00</span>
+                </div>
+                <div class="color-control">
+                    <span>Green </span>
+                    <input type="range" class="slider" name="" id="green" value="0" min="0" max="15"/>
+                    <span class="hex-value">00</span>
+                </div>
+                <div class="color-control">
+                    <span>Blue </span>
+                    <input type="range" class="slider" name="" id="blue" value="0" min="0" max="15"/>
+                    <span class="hex-value">00</span>
+                </div>
+            </div>
+            <div id="buttons-panel">
+                <button id="newgame-btn">New Game</button>
+                <button id="guess-btn">Guess</button>
+                <button id="reveal-btn">Reveal Color</button>
+            </div>
+            <div id="modes">
+                <input type="checkbox" id="switch-easy"/><label for="switch-easy">Toggle</label>
+                <span>Easy mode</span>
+            </div>
+            <div id="easy-to-guess" class="hidden"></div>
+            <div id="guesses"></div>
+        </main>
+        <footer>
+            <p>Made by <a href="https://ivanr3d.com/vcard/index.html?lang=en">Iván R. Artiles</a></p>
+            <p>Based on <a href="https://github.com/susam/myrgb" target="_blank">myrgb</a></p>
+        </footer>
+    </article>
 
-      const LOGGING = false
-      const MAX_ATTEMPTS = 99
-
-      let r = 0
-      let g = 0
-      let b = 0
-      let rin, gin, bin
-      let rr, gg, bb
-      let info, submit, restart, result
-      let attempts = 0
-
-      function init () {
-        rin = document.getElementById('rin')
-        gin = document.getElementById('gin')
-        bin = document.getElementById('bin')
-        info = document.getElementById('info')
-        submit = document.getElementById('submit')
-        restart = document.getElementById('restart')
-        result = document.getElementById('result')
-        rin.addEventListener('change', readInput)
-        gin.addEventListener('change', readInput)
-        bin.addEventListener('change', readInput)
-        rin.addEventListener('input', readInput)
-        gin.addEventListener('input', readInput)
-        bin.addEventListener('input', readInput)
-        submit.addEventListener('click', submitInput)
-        restart.addEventListener('click', newGame)
-        newGame()
-      }
-
-      function newGame () {
-        pickRGB()
-        setupGame(r, g, b)
-      }
-
-      function setGame (rr, gg, bb) { // eslint-disable-line no-unused-vars
-        // Useful to set arbitrary colors for local testing.
-        r = rr
-        g = gg
-        b = bb
-        setupGame(r, g, b)
-      }
-
-      function pickRGB () {
-        r = Math.floor(Math.random() * 16)
-        g = Math.floor(Math.random() * 16)
-        b = Math.floor(Math.random() * 16)
-      }
-
-      function setupGame (r, g, b) {
-        log('setting up new game')
-        info.style.display = 'inline-block'
-        submit.style.display = 'none'
-        restart.style.display = 'none'
-        result.innerHTML = ''
-        attempts = 0
-        rin.disabled = gin.disabled = bin.disabled = false
-        rin.value = bin.value = gin.value = 7
-        paintGame(r, g, b)
-        log('new game is ready')
-      }
-
-      function paintGame (r, g, b) {
-        const dark = luminance(r, g, b) < luminance(8, 8, 8)
-        document.body.style.background = hex(r, g, b)
-        document.body.style.color = dark ? '#fff' : '#000'
-        rin.style.accentColor = dark ? '#f99' : '#900'
-        gin.style.accentColor = dark ? '#0c0' : '#050'
-        bin.style.accentColor = dark ? '#0cf' : '#00f'
-        const anchors = document.getElementsByTagName('a')
-        for (let i = 0; i < anchors.length; ++i) {
-          const a = anchors[i]
-          a.style.color = dark ? '#eef' : '#006'
-        }
-      }
-
-      function readInput () {
-        rr = rin.valueAsNumber
-        gg = gin.valueAsNumber
-        bb = bin.valueAsNumber
-        submit.innerHTML = 'Submit ' + hex(rr, gg, bb)
-        submit.style.display = 'inline-block'
-        info.style.display = 'none'
-      }
-
-      function submitInput () {
-        addMove(r, g, b, rr, gg, bb, ++attempts)
-      }
-
-      function addMove (r, g, b, rr, gg, bb, attempts) {
-        const dark = luminance(rr, gg, bb) < luminance(8, 8, 8)
-        const rgbHex = hex(rr, gg, bb)
-        const won = rr === r && gg === g && bb === b
-        const lPad = attempts < 10 ? '&nbsp;' : ''
-        const rPad = '&nbsp;'
-        let scored = score(r, g, b, rr, gg, bb)
-        const div = document.createElement('div')
-        scored = (scored < 10 ? '0' : '') + scored
-        div.style.background = rgbHex
-        div.style.color = dark ? '#fff' : '#000'
-        div.innerHTML = lPad + attempts + ') ' + rgbHex
-        log('input=' + rr + ',' + gg + ',' + bb + ' hex=' + rgbHex +
-            ' scored=' + scored + ' won=' + won)
-        if (won) {
-          div.innerHTML += ' (Splendid!)' + rPad
-          div.style.border = 'thin solid #' + (dark ? 'ccc' : '333')
-          win()
-        } else {
-          div.innerHTML += ' (' + scored + '% match)' + rPad
-        }
-        document.getElementById('result').prepend(div)
-        if (attempts === MAX_ATTEMPTS) {
-          halt()
-        }
-      }
-
-      function halt () {
-        rin.disabled = gin.disabled = bin.disabled = true
-        submit.style.display = 'none'
-        restart.style.display = 'inline-block'
-        log('halt complete')
-      }
-
-      function win () {
-        submit.style.display = 'none'
-        restart.style.display = 'inline-block'
-        log('win complete')
-      }
-
-      function score (r, g, b, rr, gg, bb) {
-        const maxRErr = Math.max(r, 15 - r)
-        const maxGErr = Math.max(g, 15 - g)
-        const maxBErr = Math.max(b, 15 - b)
-        const maxDist = Math.sqrt(maxRErr * maxRErr +
-                                  maxGErr * maxGErr +
-                                  maxBErr * maxBErr)
-        const rErr = Math.abs(rr - r)
-        const gErr = Math.abs(gg - g)
-        const bErr = Math.abs(bb - b)
-        const dist = Math.sqrt(rErr * rErr +
-                               gErr * gErr +
-                               bErr * bErr)
-        return Math.floor(100 * (1 - dist / maxDist))
-      }
-
-      function hex (r, g, b) {
-        const rs = r.toString(16)
-        const gs = g.toString(16)
-        const bs = b.toString(16)
-        return ('#' + rs + gs + bs).toUpperCase()
-      }
-
-      function luminance (r, g, b) {
-        // Reference: https://www.w3.org/TR/WCAG20-TECHS/G17.html
-        const rl = sRGBToLinear(r)
-        const gl = sRGBToLinear(g)
-        const bl = sRGBToLinear(b)
-        return 0.2126 * rl + 0.7152 * gl + 0.0722 * bl
-      }
-
-      function sRGBToLinear (c) {
-        c = c / 15
-        if (c <= 0.03928) {
-          return c / 12.92
-        } else {
-          return Math.pow((c + 0.055) / 1.055, 2.4)
-        }
-      }
-
-      function log () {
-        const args = Array.prototype.slice.call(arguments)
-        if (LOGGING) {
-          console.log('attempts=' + attempts +
-                      ' color=' + r + ',' + g + ',' + b +
-                      ' hex=' + hex(r, g, b) +
-                      ' ' + args.join(' '))
-        }
-      }
-
-      window.addEventListener('load', init)
-    </script>
-  </head>
-  <body>
-    <main>
-      <h1>Guess My RGB</h1>
-      <div class="ruler">
-        <label>&nbsp;</label>
-        <div>
-          <span>0</span>
-          <span>1</span>
-          <span>2</span>
-          <span>3</span>
-          <span>4</span>
-          <span>5</span>
-          <span>6</span>
-          <span>7</span>
-          <span>8</span>
-          <span>9</span>
-          <span>A</span>
-          <span>B</span>
-          <span>C</span>
-          <span>D</span>
-          <span>E</span>
-          <span>F</span>
+    <div id="about-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="header">
+                <h2>About the Game</h2>
+                <span class="close">X</span>
+            </div>
+            <div class="body">
+                <p>
+                    Guess My HEX is a color guessing game where you try to match the background color using RGB sliders. 
+                    RGB stands for Red, Green, and Blue, which are the primary colors of light. By adjusting the amount of each, you can create millions of different colors!
+                </p>
+                <p>
+                    HEX codes represent colors as a combination of Red, Green, and Blue values in hexadecimal format. A HEX code starts with a <code>#</code> followed by six digits, with two digits each for Red, Green, and Blue. The values range from <code>00</code> (no color) to <code>FF</code> (maximum color).
+                </p>
+                <ul class="list-disc list-inside mt-2">
+                    <li>Use the Red, Green, and Blue sliders to mix your color.</li>
+                    <li>Each slider has 16 positions (00-FF in hexadecimal, in steps of 17).</li>
+                    <li>Click [Guess] to see how close you are to the target color.</li>
+                    <li>The percentage shows how close your guess is.</li>
+                    <li>Toggle [Easy Mode] to see your current color mix in real-time.</li>
+                    <li>Use [Reveal Color] if you're stuck and want to see the target hex code.</li>
+                    <li>Keep guessing until you match the background color perfectly!</li>
+                </ul>
+                <p>Project on <a href="https://github.com/IvanR3D/myrgb" target="_blank">GitHub</a></p>
+            </div>
         </div>
-      </div>
-      <div class="slider">
-        <label for="rin">R</label>
-        <input type="range" id="rin" name="rin" max="15" list="values">
-      </div>
-      <div class="slider">
-        <label for="gin">G</label>
-        <input type="range" id="gin" name="gin" max="15" list="values">
-      </div>
-      <div class="slider">
-        <label for="bin">B</label>
-        <input type="range" id="bin" name="bin" max="15" list="values">
-      </div>
-      <datalist id="values">
-        <option value="0" label="0"></option>
-        <option value="1" label="1"></option>
-        <option value="2" label="2"></option>
-        <option value="3" label="3"></option>
-        <option value="4" label="4"></option>
-        <option value="5" label="5"></option>
-        <option value="6" label="6"></option>
-        <option value="7" label="7"></option>
-        <option value="8" label="8"></option>
-        <option value="9" label="9"></option>
-        <option value="10" label="A"></option>
-        <option value="11" label="B"></option>
-        <option value="12" label="C"></option>
-        <option value="13" label="D"></option>
-        <option value="14" label="E"></option>
-        <option value="15" label="F"></option>
-      </datalist>
-      <div id="info">Move the sliders above to guess the background RGB color.</div>
-      <button id="submit"></button>
-      <button id="restart">New Game</button>
-      <div id="result"></div>
-    </main>
-    <footer>
-      <a href="https://github.com/susam/myrgb">GitHub</a>
-      <a href="https://mastodon.social/@susam">Mastodon</a>
-      <a href="https://susam.net/links.html">Links</a>
-    </footer>
-  </body>
+    </div>    
+
+    <script type="module">
+        import confetti from "https://cdn.skypack.dev/canvas-confetti";
+        
+        function launchConfetti() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    
+        const DIV = document.getElementById("guesses");
+        let tries = 0;
+        let colorToGuess;
+    
+        document.getElementById("about-btn").addEventListener("click", () => {
+            document.getElementById("about-modal").classList.remove("hidden");
+        });
+        document.getElementsByClassName("close")[0].addEventListener("click", () => document.getElementById("about-modal").classList.add("hidden"));
+        window.onclick = function(event) {
+            if (event.target == document.getElementById("about-modal")) {
+                document.getElementById("about-modal").classList.add("hidden");
+            }
+        };
+    
+        document.getElementById("switch-easy").addEventListener("click", () => {
+            changeEasyColor();
+            document.getElementById("easy-to-guess").classList.toggle("hidden");
+        });
+    
+        function randomColor() {
+            const RED = Math.floor(Math.random() * 16).toString(16);
+            const GREEN = Math.floor(Math.random() * 16).toString(16);
+            const BLUE = Math.floor(Math.random() * 16).toString(16);
+            return RED + RED + GREEN + GREEN + BLUE + BLUE;
+        }
+    
+        function newGame() {
+            tries = 0;
+            DIV.innerHTML = "";
+            colorToGuess = randomColor();
+            document.getElementById("color-to-guess").style.backgroundColor = "#" + colorToGuess;
+            document.getElementById("guess-btn").disabled = false;
+        }
+    
+        function changeValue(el) {
+            el.parentElement.children[2].textContent = parseInt(el.value).toString(16).toUpperCase() + parseInt(el.value).toString(16).toUpperCase();
+            changeEasyColor();
+        }
+    
+        document.getElementById("guess-btn").addEventListener("click", () => {
+            const GUESS = getHexColor();
+            postTry();
+            if (GUESS === colorToGuess.toUpperCase()) {
+                document.getElementById("guess-btn").disabled = true;
+                launchConfetti();
+            }
+        });
+    
+        function getHexColor() {
+            const HEX_VALUES = document.getElementsByClassName("hex-value");
+            let color = "";
+            for (const value of HEX_VALUES) {
+                color += value.textContent;
+            }
+            return color;
+        }
+    
+        function changeEasyColor() {
+            const color = getHexColor();
+            document.getElementById("easy-to-guess").style.backgroundColor = "#" + color;
+        }
+    
+        function revealColor() {
+            document.getElementById("color-to-guess").style.opacity = "0.8";
+            document.getElementById("color-to-guess").textContent = "#" + colorToGuess.toUpperCase();
+            document.getElementById("reveal-btn").disabled = true;
+        }
+    
+        function postTry() {
+            tries++;
+            const GUESS = getHexColor();
+            let percentage = Math.floor(getSimilarityPercentage(`#${colorToGuess}`, `#${GUESS}`));
+            let classColor;
+            if (percentage < 20) {
+                classColor = "red";
+            } else if (percentage < 50) {
+                classColor = "orange";
+            } else if (percentage < 90) {
+                classColor = "yellow";
+            }
+            if (percentage >= 90) {
+                classColor = "green";
+            }
+            DIV.classList.add("guess-try");
+            DIV.innerHTML += `
+            <div class="guess-try">
+                <div>
+                    <span>${tries}</span>
+                    <div class="color" style="background-color:#${GUESS}"></div>
+                </div>
+                <span>#${GUESS}</span>
+                <span class="${classColor}">${percentage}% match</span>
+            </div>
+            `;
+        }
+    
+        function hexToRgb(hex) {
+            let r = parseInt(hex.slice(1, 3), 16);
+            let g = parseInt(hex.slice(3, 5), 16);
+            let b = parseInt(hex.slice(5, 7), 16);
+            return { r, g, b };
+        }
+    
+        function colorDistance(color1, color2) {
+            let rDiff = color1.r - color2.r;
+            let gDiff = color1.g - color2.g;
+            let bDiff = color1.b - color2.b;
+            return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+        }
+    
+        function getSimilarityPercentage(hex1, hex2) {
+            let color1 = hexToRgb(hex1);
+            let color2 = hexToRgb(hex2);
+            
+            let distance = colorDistance(color1, color2);
+            let maxDistance = Math.sqrt(3 * 255 * 255);
+            
+            return (1 - (distance / maxDistance)) * 100;
+        }
+    
+        document.getElementById("newgame-btn").addEventListener("click", () => newGame());
+        document.getElementById("reveal-btn").addEventListener("click", () => revealColor());
+        document.querySelectorAll(".slider").forEach((el)=>{
+            el.addEventListener("input", ()=>{
+                changeValue(el)
+            })
+        })
+        document.addEventListener('DOMContentLoaded', function () {
+            newGame();
+        })
+    </script>
+    
+</body>
 </html>
